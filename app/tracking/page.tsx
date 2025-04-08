@@ -5,26 +5,14 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
-import {
-  Package2,
-  ArrowLeft,
-  Truck,
-  CheckCircle,
-  AlertCircle,
-  Clock,
-  MapPin,
-  Calendar,
-  Camera,
-  ChevronLeft,
-  ChevronRight,
-  Share2,
-} from "lucide-react"
+import { Package2, ArrowLeft, Truck, CheckCircle, AlertCircle, Clock, MapPin, Calendar, Camera, ChevronLeft, ChevronRight, Share2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AnimatedPulseLine } from "@/components/ui/animated-pulse-line"
 import { MainNav } from "@/components/main-nav"
+import { SiteFooter } from "@/components/site-footer"
 import { type Shipment, findShipmentByTracking } from "@/lib/demo-shipments"
 import { isValidTrackingNumber } from "@/lib/utils"
 
@@ -299,6 +287,26 @@ export default function TrackingPage() {
       {/* Main Content */}
       <section className="py-12 md:py-16 bg-gray-50">
         <div className="container">
+          {notFound && (
+            <Card className="border-none shadow-lg mb-8">
+              <CardHeader className="bg-red-500 text-white rounded-t-xl">
+                <CardTitle>Tracking Number Not Found</CardTitle>
+                <CardDescription className="text-white/80">
+                  We couldn't find any shipment with the provided tracking number.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center justify-center py-8">
+                  <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Results Found</h3>
+                  <p className="text-gray-600 text-center mb-6 max-w-md">
+                    The tracking number you entered was not found in our system. Please check the number and try again.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {shipment && (
             <div className="mb-12">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -552,7 +560,7 @@ export default function TrackingPage() {
                         </div>
                       </div>
 
-                      {/* Package Image Showcase - Only show if there are images - MOVED BELOW DELIVERY INFO */}
+                      {/* Package Image Showcase - Only show if there are images */}
                       {shipment.images.length > 0 && (
                         <div className="mt-8">
                           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
@@ -613,4 +621,197 @@ export default function TrackingPage() {
                               </div>
                             )}
                           </div>
-                        \
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="history">
+                  <Card className="border-none shadow-lg">
+                    <CardHeader className="bg-navy-800 text-white rounded-t-xl">
+                      <CardTitle>Shipment History</CardTitle>
+                      <CardDescription className="text-gray-300">
+                        Track the journey of your package from origin to destination.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                      <div className="space-y-6">
+                        <div className="flex items-start gap-4">
+                          <div className="flex flex-col items-center">
+                            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                              <Package2 className="h-5 w-5" />
+                            </div>
+                            <div className="w-0.5 h-16 bg-gray-200 mt-2"></div>
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-navy-900">Package Received</h3>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Your package was received at our facility for processing.
+                            </p>
+                            <p className="text-xs text-gray-500 mt-2">
+                              {new Date(shipment.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        {shipment.status !== "pending" && (
+                          <div className="flex items-start gap-4">
+                            <div className="flex flex-col items-center">
+                              <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white">
+                                <Truck className="h-5 w-5" />
+                              </div>
+                              <div className="w-0.5 h-16 bg-gray-200 mt-2"></div>
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-navy-900">Package Dispatched</h3>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Your package has been dispatched from our facility and is on its way.
+                              </p>
+                              <p className="text-xs text-gray-500 mt-2">
+                                {new Date(shipment.updatedAt).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {(shipment.status === "out-for-delivery" || shipment.status === "delivered") && (
+                          <div className="flex items-start gap-4">
+                            <div className="flex flex-col items-center">
+                              <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                                <MapPin className="h-5 w-5" />
+                              </div>
+                              <div className="w-0.5 h-16 bg-gray-200 mt-2"></div>
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-navy-900">Out for Delivery</h3>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Your package is out for delivery to your address.
+                              </p>
+                              <p className="text-xs text-gray-500 mt-2">
+                                {new Date(shipment.updatedAt).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {shipment.status === "delivered" && (
+                          <div className="flex items-start gap-4">
+                            <div className="flex flex-col items-center">
+                              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                <CheckCircle className="h-5 w-5" />
+                              </div>
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-navy-900">Delivered</h3>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Your package has been delivered successfully.
+                              </p>
+                              <p className="text-xs text-gray-500 mt-2">
+                                {new Date(shipment.updatedAt).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="info">
+                  <Card className="border-none shadow-lg">
+                    <CardHeader className="bg-navy-800 text-white rounded-t-xl">
+                      <CardTitle>Package Information</CardTitle>
+                      <CardDescription className="text-gray-300">
+                        Details about your shipment and delivery preferences.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h3 className="text-lg font-medium text-navy-900 mb-4">Shipment Details</h3>
+                          <div className="space-y-4">
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                              <span className="text-gray-600">Tracking Number</span>
+                              <span className="font-medium text-navy-900">{shipment.trackingNumber}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                              <span className="text-gray-600">Service Type</span>
+                              <span className="font-medium text-navy-900">Standard Delivery</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                              <span className="text-gray-600">Package Weight</span>
+                              <span className="font-medium text-navy-900">2.5 kg</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                              <span className="text-gray-600">Dimensions</span>
+                              <span className="font-medium text-navy-900">30 × 20 × 15 cm</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Description</span>
+                              <span className="font-medium text-navy-900">{shipment.description || "N/A"}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-lg font-medium text-navy-900 mb-4">Delivery Information</h3>
+                          <div className="space-y-4">
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                              <span className="text-gray-600">Recipient</span>
+                              <span className="font-medium text-navy-900">{shipment.customerName}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                              <span className="text-gray-600">Address</span>
+                              <span className="font-medium text-navy-900">{shipment.address}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                              <span className="text-gray-600">State/Region</span>
+                              <span className="font-medium text-navy-900">{shipment.state}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                              <span className="text-gray-600">Sender</span>
+                              <span className="font-medium text-navy-900">{shipment.senderName}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Shipping Date</span>
+                              <span className="font-medium text-navy-900">
+                                {new Date(shipment.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+
+          {!shipment && !notFound && !isSearching && (
+            <div className="text-center py-12">
+              <Package2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-navy-900 mb-2">Track Your Shipment</h2>
+              <p className="text-gray-600 max-w-md mx-auto mb-8">
+                Enter your tracking number above to get real-time updates on your package's journey.
+              </p>
+            </div>
+          )}
+
+          {isSearching && (
+            <div className="text-center py-12">
+              <div className="h-16 w-16 animate-spin rounded-full border-4 border-current border-t-transparent text-cyan-600 mx-auto mb-4"></div>
+              <h2 className="text-2xl font-bold text-navy-900 mb-2">Searching...</h2>
+              <p className="text-gray-600 max-w-md mx-auto">
+                We're looking up your shipment information. This will just take a moment.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <SiteFooter />
+    </div>
+  )
+}
