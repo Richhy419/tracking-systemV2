@@ -1,0 +1,277 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 83% 53%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground overflow-x-hidden;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+
+  /* Prevent horizontal overflow */
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Make sure all containers respect viewport width */
+  .container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom progress bar animation */
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-progress {
+  animation: progress 2s ease-in-out forwards;
+}
+
+/* Pulse animation for the tracking line */
+.pulse-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.pulse-line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  animation: slide-right 2s linear infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(90deg, #0891b2, #4764b5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Grid pattern background */
+.grid-pattern {
+  background-image: linear-gradient(rgba(226, 232, 240, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(226, 232, 240, 0.3) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Ripple effect for buttons */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+}
+
+/* Animated underline for links */
+.animated-underline {
+  position: relative;
+}
+
+.animated-underline::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: currentColor;
+  transition: width 0.3s ease;
+}
+
+.animated-underline:hover::after {
+  width: 100%;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f3f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #adb5bd;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #868e96;
+}
+
+/* Fix for mobile horizontal scroll issues */
+.grid {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Improved image handling for mobile */
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* For Next.js Image component */
+.next-image-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.next-image-wrapper > span {
+  position: unset !important;
+}
+
+.next-image-wrapper img {
+  object-fit: contain !important;
+  position: relative !important;
+  width: 100% !important;
+  height: unset !important;
+}
+
+/* Ensure text doesn't overflow containers */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+div {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Improved image handling for logos */
+.image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+/* Slightly rounded corners for images */
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
+/* Ensure images don't overflow their containers */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Constrain image sizes in logo containers */
+.logo-container img {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+}
