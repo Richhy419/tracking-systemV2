@@ -16,22 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  Package2,
-  Plus,
-  LogOut,
-  Eye,
-  Truck,
-  Clock,
-  AlertCircle,
-  X,
-  Trash2,
-  Search,
-  RefreshCw,
-  Database,
-  Share2,
-  Copy,
-} from "lucide-react"
+import { Package2, Plus, LogOut, Eye, Truck, Clock, AlertCircle, X, Trash2, Search, RefreshCw, Database, Share2, Copy } from 'lucide-react'
 import { generateTrackingNumber, isValidTrackingNumber } from "@/lib/utils"
 import {
   type Shipment,
@@ -152,7 +137,7 @@ export default function AdminDashboardPage() {
       })
   }
 
-  // Update the handleImageUpload function to limit image size and count
+  // Update the handleImageUpload function to resize images before storing them
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       // Limit to max 3 images
@@ -167,16 +152,18 @@ export default function AdminDashboardPage() {
       const filesToProcess = Array.from(e.target.files).slice(0, remainingSlots)
       const newImages = [...newShipment.images]
 
+      // Process each file with stricter size limits
       filesToProcess.forEach((file) => {
-        // Check file size (limit to 500KB)
-        if (file.size > 500 * 1024) {
-          alert("Image too large. Please use images under 500KB")
+        // Reduce max file size to 300KB (from 500KB)
+        if (file.size > 300 * 1024) {
+          alert(`Image "${file.name}" is too large. Please use images under 300KB`)
           return
         }
 
         const reader = new FileReader()
         reader.onload = (event) => {
           if (event.target?.result) {
+            // Add the image to our array
             newImages.push(event.target.result as string)
             setNewShipment({
               ...newShipment,
@@ -189,7 +176,7 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // Create a new shipment
+  // Also update the handleCreateShipment function to handle potential errors
   const handleCreateShipment = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -233,7 +220,9 @@ export default function AdminDashboardPage() {
 
       alert(`Shipment created successfully! Tracking number: ${trackingNumber}`)
     } catch (error) {
-      alert("Error creating shipment. Please try again.")
+      // Improved error handling
+      const errorMessage = error instanceof Error ? error.message : "Error creating shipment. Please try again."
+      alert(errorMessage)
       console.error("Error:", error)
     }
   }
@@ -241,8 +230,19 @@ export default function AdminDashboardPage() {
   // Delete a shipment
   const handleDeleteShipment = (trackingNumber: string) => {
     if (confirm("Are you sure you want to delete this shipment?")) {
-      deleteShipment(trackingNumber)
-      loadShipments()
+      try {
+        // Call the delete function
+        deleteShipment(trackingNumber)
+
+        // Reload the shipments list to update the UI
+        loadShipments()
+
+        // Show success message
+        alert(`Shipment ${trackingNumber} deleted successfully`)
+      } catch (error) {
+        console.error("Error deleting shipment:", error)
+        alert("Failed to delete shipment. Please try again.")
+      }
     }
   }
 

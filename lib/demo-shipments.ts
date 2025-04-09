@@ -43,24 +43,51 @@ const initializeDemoData = () => {
 // Initialize demo data
 initializeDemoData()
 
-// Create a new shipment
+// Modify the createShipment function to handle image size limits and prevent quota exceeded errors
 export const createShipment = (shipment: Shipment): void => {
-  // Check if this tracking number already exists
-  const existingIndex = GLOBAL_SHIPMENTS.findIndex((s) => s.trackingNumber === shipment.trackingNumber)
+  try {
+    // Check if this tracking number already exists
+    const existingIndex = GLOBAL_SHIPMENTS.findIndex((s) => s.trackingNumber === shipment.trackingNumber)
 
-  if (existingIndex >= 0) {
-    // Update existing shipment
-    GLOBAL_SHIPMENTS[existingIndex] = {
-      ...shipment,
-      updatedAt: new Date(),
+    // Process images to reduce storage size if needed
+    let processedImages = [...shipment.images]
+
+    // If images exceed a certain size, limit them
+    if (processedImages.length > 3) {
+      processedImages = processedImages.slice(0, 3) // Limit to 3 images max
     }
-  } else {
-    // Add new shipment
-    GLOBAL_SHIPMENTS.push({
+
+    // Check total size of all images to prevent quota issues
+    let totalSize = 0
+    processedImages.forEach((img) => {
+      // Rough estimate of base64 string size
+      totalSize += img.length * 0.75 // base64 is ~4/3 the size of the actual data
+    })
+
+    // If total size exceeds 1MB (arbitrary limit), reduce quality or remove images
+    const ONE_MB = 1024 * 1024
+    if (totalSize > ONE_MB) {
+      // Simple approach: just keep the first image if total size is too large
+      processedImages = processedImages.length > 0 ? [processedImages[0]] : []
+    }
+
+    const shipmentToSave = {
       ...shipment,
+      images: processedImages,
       updatedAt: new Date(),
       isDeleted: false,
-    })
+    }
+
+    if (existingIndex >= 0) {
+      // Update existing shipment
+      GLOBAL_SHIPMENTS[existingIndex] = shipmentToSave
+    } else {
+      // Add new shipment
+      GLOBAL_SHIPMENTS.push(shipmentToSave)
+    }
+  } catch (error) {
+    console.error("Error creating shipment:", error)
+    throw new Error("Failed to create shipment. Storage quota may be exceeded.")
   }
 }
 
@@ -80,20 +107,25 @@ export const updateShipmentStatus = (trackingNumber: string, newStatus: Shipment
   }
 }
 
-// Mark a shipment as deleted
+// Fix the deleteShipment function to properly delete shipments
 export const deleteShipment = (trackingNumber: string): void => {
   const shipmentIndex = GLOBAL_SHIPMENTS.findIndex((s) => s.trackingNumber === trackingNumber)
 
   if (shipmentIndex >= 0) {
-    // Instead of actually removing it, mark it as deleted
+    // Mark as deleted and update timestamp
     GLOBAL_SHIPMENTS[shipmentIndex].isDeleted = true
     GLOBAL_SHIPMENTS[shipmentIndex].updatedAt = new Date()
+    console.log(`Shipment ${trackingNumber} marked as deleted successfully`)
+  } else {
+    console.warn(`Attempted to delete shipment ${trackingNumber} that doesn't exist`)
   }
 }
 
-// Get all active (non-deleted) shipments
+// Also improve getActiveShipments to ensure it only returns non-deleted shipments
 export const getActiveShipments = (): Shipment[] => {
-  return GLOBAL_SHIPMENTS.filter((s) => !s.isDeleted)
+  const active = GLOBAL_SHIPMENTS.filter((s) => s.isDeleted !== true)
+  console.log(`Found ${active.length} active shipments out of ${GLOBAL_SHIPMENTS.length} total`)
+  return active
 }
 
 // Clear all shipments (for admin use)

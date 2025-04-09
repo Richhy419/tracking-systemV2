@@ -12,7 +12,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AnimatedPulseLine } from "@/components/ui/animated-pulse-line"
 import { MainNav } from "@/components/main-nav"
-import { SiteFooter } from "@/components/site-footer"
 import { type Shipment, findShipmentByTracking } from "@/lib/demo-shipments"
 import { isValidTrackingNumber } from "@/lib/utils"
 
@@ -299,7 +298,7 @@ export default function TrackingPage() {
                 <div className="flex flex-col items-center justify-center py-8">
                   <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">No Results Found</h3>
-                  <p className="text-gray-600 text-center mb-6 max-w-md">
+                  <p className="text-gray-600 text-center max-w-md">
                     The tracking number you entered was not found in our system. Please check the number and try again.
                   </p>
                 </div>
@@ -589,14 +588,14 @@ export default function TrackingPage() {
                               {shipment.images.length > 1 && (
                                 <>
                                   <button
-                                    onClick={prevImage}
+                                    onClick={() => prevImage()}
                                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-10"
                                     aria-label="Previous image"
                                   >
                                     <ChevronLeft className="h-5 w-5 text-navy-800" />
                                   </button>
                                   <button
-                                    onClick={nextImage}
+                                    onClick={() => nextImage()}
                                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-10"
                                     aria-label="Next image"
                                   >
@@ -810,8 +809,6 @@ export default function TrackingPage() {
           )}
         </div>
       </section>
-
-      <SiteFooter />
     </div>
   )
 }
